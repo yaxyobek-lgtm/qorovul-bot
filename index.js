@@ -1,14 +1,19 @@
+// index.js
 require('dotenv').config();
-const { Telegraf } = require('telegraf');
 const express = require('express');
+const { Telegraf } = require('telegraf');
 const banned = require('./bannedWords');
 const warnings = require('./warnings');
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
+const app = express();
+const PORT = process.env.PORT || 10000;
 
-// ======= Telegram Bot Logikasi =======
+// -----------------------------
+// Telegram bot kodi
+// -----------------------------
 
-// Yangi a'zolar
+// Yangi a'zolarni kutib olish
 bot.on('new_chat_members', async (ctx) => {
   for (const user of ctx.message.new_chat_members) {
     const name = user.username ? `@${user.username}` : user.first_name;
@@ -16,9 +21,9 @@ bot.on('new_chat_members', async (ctx) => {
   }
 });
 
-// Matnlarni tekshirish
+// Matnlarni tekshirish va ogohlantirish
 bot.on('message', async (ctx) => {
-  if (!ctx.message.text) return;
+  if (!ctx.message.text) return; // matn bo'lmasa o'tkazib yubor
 
   const text = ctx.message.text.toLowerCase();
   const words = banned.getWords();
@@ -29,7 +34,7 @@ bot.on('message', async (ctx) => {
   const userId = ctx.from.id;
   const name = ctx.from.username ? `@${ctx.from.username}` : ctx.from.first_name;
 
-  // Xabarni o'chirish
+  // Foydalanuvchi bot bo'lmasa xabarni o'chirishga harakat qilamiz
   if (!ctx.from.is_bot) {
     try {
       await ctx.deleteMessage();
@@ -58,21 +63,13 @@ bot.on('message', async (ctx) => {
 bot.launch();
 console.log("🛡 QOROVUL BOT ishlayapti...");
 
-// ======= Render va Ping Server =======
-const app = express();
-
-// Ping endpoint
+// -----------------------------
+// Render yoki UptimeRobot uchun HTTP endpoint
+// -----------------------------
 app.get('/', (req, res) => {
-  res.send('🛡 QOROVUL BOT ishlayapti!');
+  res.send('Bot ishlayapti ✅');
 });
 
-// Render PORT
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server ${PORT} portda ishlayapti`));
-
-// ======= Har 7 daqiqada Telegram chatga ping =======
-const CHAT_ID = process.env.CHAT_ID;
-
-setInterval(() => {
-  bot.telegram.sendMessage(CHAT_ID, "⏱ Ping! Server faol.");
-}, 420000); // 7 daqiqa = 420000 ms
+app.listen(PORT, () => {
+  console.log(`🌐 Server ${PORT} portda ishlayapti`);
+});
