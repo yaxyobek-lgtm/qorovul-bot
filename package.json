@@ -1,0 +1,17 @@
+{
+  "name": "qorovul-bot",
+  "version": "1.0.0",
+  "description": "Telegram guruh qorovul boti",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "telegraf": "^4.16.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
